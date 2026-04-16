@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenCut Pro Mobile</title>
+    <script>
+        // Function to save data to localStorage
+        function saveData() {
+            const jobs = document.getElementById('jobs').value;
+            const clients = document.getElementById('clients').value;
+            const crew = document.getElementById('crew').value;
+            
+            localStorage.setItem('jobs', jobs);
+            localStorage.setItem('clients', clients);
+            localStorage.setItem('crew', crew);
+        }
+
+        // Function to load data from localStorage
+        function loadData() {
+            document.getElementById('jobs').value = localStorage.getItem('jobs') || '';
+            document.getElementById('clients').value = localStorage.getItem('clients') || '';
+            document.getElementById('crew').value = localStorage.getItem('crew') || '';
+        }
+
+        // Add event listeners to save data on change
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</head>
+<body>
+    <h1>GreenCut Pro Mobile</h1>
+    <div>
+        <label for="jobs">Jobs:</label>
+        <textarea id="jobs" oninput="saveData()"></textarea>
+    </div>
+    <div>
+        <label for="clients">Clients:</label>
+        <textarea id="clients" oninput="saveData()"></textarea>
+    </div>
+    <div>
+        <label for="crew">Crew:</label>
+        <textarea id="crew" oninput="saveData()"></textarea>
+    </div>
+</body>
+</html>
