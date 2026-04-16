@@ -1,0 +1,691 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:13px}
+:root{--green:#3B6D11;--green-light:#EAF3DE;--green-mid:#639922;--green-dark:#27500A;--green-text:#27500A}
+.app{display:flex;flex-direction:column;background:var(--color-background-primary);min-height:700px}
+
+.topbar{display:flex;align-items:center;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.brand-wrap{display:flex;align-items:center;gap:10px;padding:12px 18px;border-right:0.5px solid var(--color-border-tertiary)}
+.brand-icon{width:32px;height:32px;border-radius:8px;background:#3B6D11;display:flex;align-items:center;justify-content:center}
+.brand-icon svg{width:17px;height:17px;fill:#C0DD97}
+.brand-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.brand-sub{font-size:11px;color:var(--color-text-secondary)}
+.nav{display:flex;flex:1;overflow-x:auto}
+.nav-btn{padding:14px 16px;font-size:12px;font-weight:500;color:var(--color-text-secondary);border:none;background:transparent;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .15s}
+.nav-btn:hover{color:var(--color-text-primary);background:var(--color-background-secondary)}
+.nav-btn.active{color:#3B6D11;border-bottom-color:#3B6D11}
+.top-right{display:flex;align-items:center;gap:8px;padding:0 16px;margin-left:auto;white-space:nowrap}
+.ai-badge{font-size:11px;padding:3px 8px;border-radius:20px;background:#EAF3DE;color:#27500A;font-weight:500}
+
+.page{display:none;flex:1}
+.page.active{display:flex;flex-direction:column}
+
+.stats-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:14px 18px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.stat-lbl{font-size:11px;color:var(--color-text-secondary)}
+.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary);margin-top:1px}
+.stat-sub{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+
+.two-col{display:flex;flex:1;overflow:hidden}
+.sidebar{width:260px;border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-lg{width:320px}
+.col-hdr{padding:9px 14px;font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.scroll-list{flex:1;overflow-y:auto}
+
+.job-item{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:background .12s}
+.job-item:hover,.job-item.sel{background:var(--color-background-secondary)}
+.job-item.sel{border-left:2px solid #3B6D11}
+.ji-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.ji-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.ji-service{font-size:12px;color:var(--color-text-secondary)}
+.ji-meta{font-size:11px;color:var(--color-text-secondary);margin-top:2px;display:flex;align-items:center;gap:6px}
+.dot-sep{width:3px;height:3px;border-radius:50%;background:var(--color-text-secondary);flex-shrink:0}
+
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:20px;font-weight:500}
+.bs{background:#EAF3DE;color:#27500A}
+.bi{background:#FAEEDA;color:#633806}
+.bc{background:#E6F1FB;color:#0C447C}
+.bx{background:#FCEBEB;color:#791F1F}
+.bp{background:#F1EFE8;color:#444441}
+
+.detail-panel{flex:1;overflow-y:auto;padding:18px}
+.dp-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.dp-title{font-size:17px;font-weight:500;color:var(--color-text-primary)}
+.dp-sub{font-size:13px;color:var(--color-text-secondary);margin-top:3px}
+.dp-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.act-btn{font-size:12px;padding:6px 12px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;color:var(--color-text-primary)}
+.act-btn:hover{background:var(--color-background-secondary)}
+.act-btn.primary{background:#3B6D11;color:#C0DD97;border-color:#3B6D11}
+.act-btn.primary:hover{background:#27500A}
+.act-btn.danger{color:#791F1F;border-color:#F09595}
+.act-btn.danger:hover{background:#FCEBEB}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.info-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px}
+.info-lbl{font-size:11px;color:var(--color-text-secondary);margin-bottom:2px}
+.info-val{font-size:13px;color:var(--color-text-primary);font-weight:500}
+.section-hdr{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px}
+.notes-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;font-size:13px;color:var(--color-text-primary);line-height:1.6;min-height:60px}
+.checklist{display:flex;flex-direction:column;gap:6px}
+.check-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--color-text-primary)}
+.check-item input[type=checkbox]{width:15px;height:15px;accent-color:#3B6D11;cursor:pointer}
+.check-done{text-decoration:line-through;color:var(--color-text-secondary)}
+
+.crew-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;padding:16px}
+.crew-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px}
+.crew-avatar{width:40px;height:40px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;color:#27500A;margin-bottom:10px}
+.crew-name{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.crew-role{font-size:12px;color:var(--color-text-secondary);margin-bottom:8px}
+.crew-stats{display:flex;gap:12px}
+.cs-item{font-size:11px;color:var(--color-text-secondary)}
+.cs-num{font-size:15px;font-weight:500;color:var(--color-text-primary);display:block}
+.crew-status{display:flex;align-items:center;gap:4px;margin-top:8px}
+.status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sd-active{background:#639922}
+.sd-off{background:#888780}
+
+.rev-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:16px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.rev-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px}
+.rev-lbl{font-size:11px;color:var(--color-text-secondary)}
+.rev-val{font-size:22px;font-weight:500;color:var(--color-text-primary);margin-top:2px}
+.rev-chg{font-size:11px;margin-top:2px}
+.rev-up{color:#3B6D11}
+.rev-dn{color:#A32D2D}
+.service-list{padding:16px}
+.svc-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
+.svc-name{font-size:13px;color:var(--color-text-primary)}
+.svc-bar-wrap{flex:1;margin:0 12px;height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.svc-bar{height:100%;background:#3B6D11;border-radius:3px}
+.svc-rev{font-size:13px;font-weight:500;color:var(--color-text-primary);min-width:60px;text-align:right}
+
+.client-item{padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary);cursor:pointer}
+.client-item:hover{background:var(--color-background-secondary)}
+.ci-avatar{width:32px;height:32px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;color:#27500A;flex-shrink:0}
+.ci-row{display:flex;align-items:center;gap:10px}
+.ci-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.ci-meta{font-size:11px;color:var(--color-text-secondary);margin-top:1px}
+
+.chat-col{flex:1;display:flex;flex-direction:column;min-height:0}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:84%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.55}
+.msg-ai{align-self:flex-start;background:var(--color-background-secondary);color:var(--color-text-primary);border-bottom-left-radius:3px}
+.msg-user{align-self:flex-end;background:#3B6D11;color:#EAF3DE;border-bottom-right-radius:3px}
+.msg-ts{font-size:10px;color:var(--color-text-secondary);margin-top:3px;opacity:.7}
+.typing{align-self:flex-start;display:flex;gap:4px;align-items:center;padding:9px 13px;background:var(--color-background-secondary);border-radius:12px;border-bottom-left-radius:3px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--color-text-secondary);animation:bop .85s infinite}
+.dot:nth-child(2){animation-delay:.14s}.dot:nth-child(3){animation-delay:.28s}
+@keyframes bop{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.qbtns{display:flex;gap:5px;flex-wrap:wrap;padding:8px 14px 4px}
+.qb{font-size:11px;padding:4px 9px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;color:var(--color-text-secondary)}
+.qb:hover{background:var(--color-background-secondary)}
+.input-row{padding:10px 14px;border-top:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;align-items:center;flex-shrink:0}
+.chat-input{flex:1;border:0.5px solid var(--color-border-secondary);border-radius:20px;padding:7px 14px;font-size:13px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none}
+.chat-input:focus{border-color:#3B6D11;box-shadow:0 0 0 3px rgba(59,109,17,.12)}
+.send-btn{width:32px;height:32px;border-radius:50%;background:#3B6D11;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.send-btn:hover{background:#27500A}
+.send-btn svg{width:13px;height:13px;fill:#C0DD97}
+
+.empty-hint{padding:32px;text-align:center;color:var(--color-text-secondary);font-size:13px;line-height:1.7}
+
+.route-day{margin-bottom:16px}
+.route-date{font-size:12px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;padding:8px 14px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.route-stop{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.stop-num{width:22px;height:22px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#27500A;flex-shrink:0;margin-top:1px}
+.stop-info{flex:1}
+.stop-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
+.stop-detail{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+
+.form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.form-label{font-size:12px;color:var(--color-text-secondary)}
+.form-input{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:7px 10px;font-size:13px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%}
+.form-input:focus{border-color:#3B6D11}
+.form-select{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:7px 10px;font-size:13px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;width:100%}
+.modal-bg{background:rgba(0,0,0,0.35);display:flex;align-items:center;justify-content:center;padding:20px;min-height:500px}
+.modal{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:20px;width:100%;max-width:440px}
+.modal-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:16px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+</style>
+
+<h2 class="sr-only">Green Cut Pro — full landscaping business management app with jobs, crew, clients, revenue, routes, and AI dispatcher</h2>
+
+<div class="app">
+<div class="topbar">
+  <div class="brand-wrap">
+    <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 21.34L5.71 22l1-2.3A4.49 4.49 0 0 0 8 20C19 20 22 3 22 3c-1 2-8 2-8 2 0-4-3-5-5-2 0-1 .5-2 1-2C6 1 2 6 2 11c0 1.93.49 3.76 1.36 5.35L7 11c.5-2 2.5-4 5-4h5z"/></svg></div>
+    <div><div class="brand-name">Green Cut Pro</div><div class="brand-sub">Houston, TX</div></div>
+  </div>
+  <div class="nav" id="nav">
+    <button class="nav-btn active" onclick="showPage('dashboard',this)">Dashboard</button>
+    <button class="nav-btn" onclick="showPage('jobs',this)">Jobs</button>
+    <button class="nav-btn" onclick="showPage('clients',this)">Clients</button>
+    <button class="nav-btn" onclick="showPage('crew',this)">Crew</button>
+    <button class="nav-btn" onclick="showPage('revenue',this)">Revenue</button>
+    <button class="nav-btn" onclick="showPage('routes',this)">Routes</button>
+    <button class="nav-btn" onclick="showPage('dispatch',this)">AI Dispatch</button>
+  </div>
+  <div class="top-right"><span class="ai-badge">AI Powered</span></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="stats-grid" id="dash-stats">
+    <div class="stat"><div class="stat-lbl">Jobs today</div><div class="stat-val" id="s-today">0</div></div>
+    <div class="stat"><div class="stat-lbl">This week</div><div class="stat-val" id="s-week">0</div></div>
+    <div class="stat"><div class="stat-lbl">Pending</div><div class="stat-val" id="s-pending">0</div></div>
+    <div class="stat"><div class="stat-lbl">Active crew</div><div class="stat-val" id="s-crew">0</div></div>
+    <div class="stat"><div class="stat-lbl">Revenue (mo)</div><div class="stat-val" id="s-rev">$0</div></div>
+    <div class="stat"><div class="stat-lbl">Total clients</div><div class="stat-val" id="s-clients">0</div></div>
+  </div>
+  <div class="two-col">
+    <div class="sidebar">
+      <div class="col-hdr"><span>Today's jobs</span></div>
+      <div class="scroll-list" id="dash-today-list"><div class="empty-hint">No jobs today.<br>Use AI Dispatch to schedule.</div></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:18px">
+      <div class="section-hdr">Upcoming this week</div>
+      <div id="dash-week-list"><div style="color:var(--color-text-secondary);font-size:13px">No upcoming jobs.</div></div>
+      <div class="section-hdr" style="margin-top:20px">Recent activity</div>
+      <div id="dash-activity"><div style="color:var(--color-text-secondary);font-size:13px">No recent activity.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- JOBS -->
+<div class="page" id="page-jobs">
+  <div class="two-col">
+    <div class="sidebar">
+      <div class="col-hdr">
+        <span>All jobs</span>
+        <button class="act-btn primary" style="padding:3px 9px;font-size:11px" onclick="openNewJob()">+ New</button>
+      </div>
+      <div style="padding:8px 10px;border-bottom:0.5px solid var(--color-border-tertiary)">
+        <select class="form-select" style="width:100%;font-size:11px" onchange="filterJobs(this.value)" id="job-filter">
+          <option value="all">All statuses</option>
+          <option value="scheduled">Scheduled</option>
+          <option value="in-progress">In progress</option>
+          <option value="pending">Pending</option>
+          <option value="complete">Complete</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="scroll-list" id="jobs-list"></div>
+    </div>
+    <div class="detail-panel" id="job-detail">
+      <div class="empty-hint">Select a job to view details, or create a new one.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div class="page" id="page-clients">
+  <div class="two-col">
+    <div class="sidebar sidebar-lg">
+      <div class="col-hdr">
+        <span>Clients</span>
+        <button class="act-btn primary" style="padding:3px 9px;font-size:11px" onclick="openNewClient()">+ Add</button>
+      </div>
+      <div class="scroll-list" id="clients-list"></div>
+    </div>
+    <div class="detail-panel" id="client-detail">
+      <div class="empty-hint">Select a client to view their history and details.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CREW -->
+<div class="page" id="page-crew">
+  <div class="col-hdr" style="border-bottom:0.5px solid var(--color-border-tertiary)">
+    <span>Crew members</span>
+    <button class="act-btn primary" style="padding:3px 9px;font-size:11px" onclick="openNewCrew()">+ Add crew</button>
+  </div>
+  <div class="crew-grid" id="crew-grid"></div>
+</div>
+
+<!-- REVENUE -->
+<div class="page" id="page-revenue">
+  <div class="rev-grid" id="rev-stats">
+    <div class="rev-card"><div class="rev-lbl">This month</div><div class="rev-val" id="r-month">$0</div><div class="rev-chg" id="r-month-chg"></div></div>
+    <div class="rev-card"><div class="rev-lbl">This year</div><div class="rev-val" id="r-year">$0</div></div>
+    <div class="rev-card"><div class="rev-lbl">Avg job value</div><div class="rev-val" id="r-avg">$0</div></div>
+  </div>
+  <div class="two-col" style="flex:1">
+    <div style="flex:1;border-right:0.5px solid var(--color-border-tertiary)">
+      <div class="col-hdr"><span>Revenue by service</span></div>
+      <div class="service-list" id="rev-by-service"><div class="empty-hint">Complete jobs to see revenue breakdown.</div></div>
+    </div>
+    <div style="flex:1">
+      <div class="col-hdr"><span>Recent payments</span></div>
+      <div class="scroll-list" id="rev-payments"><div class="empty-hint">No payments recorded yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ROUTES -->
+<div class="page" id="page-routes">
+  <div class="two-col">
+    <div style="flex:1;border-right:0.5px solid var(--color-border-tertiary)">
+      <div class="col-hdr"><span>Daily route planner</span></div>
+      <div class="scroll-list" id="route-list"><div class="empty-hint">Routes auto-generate from scheduled jobs.<br>Add jobs via AI Dispatch.</div></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:16px">
+      <div class="section-hdr">Route tips</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);line-height:1.7">
+        Routes are organized by date and crew. Complete jobs are marked automatically. Use AI Dispatch to reorganize by location or crew capacity.
+      </div>
+      <div style="margin-top:16px">
+        <button class="act-btn" onclick="sq('Optimize my routes for this week by location')">Optimize routes ↗</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI DISPATCH -->
+<div class="page" id="page-dispatch">
+  <div class="two-col" style="flex:1;min-height:0">
+    <div class="sidebar" style="width:240px">
+      <div class="col-hdr"><span>Quick actions</span></div>
+      <div style="padding:10px;display:flex;flex-direction:column;gap:6px">
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Schedule a new landscaping job')">+ Schedule new job</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Show me all jobs this week')">View this week</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Who is available tomorrow?')">Crew availability</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Which jobs are pending confirmation?')">Pending jobs</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Reschedule all pending jobs to next week')">Bulk reschedule</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('How much revenue did I make this month?')">Revenue summary</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Add a new crew member')">Add crew member</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Generate a quote for a new client')">Create a quote</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Mark a job as complete and log payment')">Complete + pay</button>
+        <button class="qb" style="text-align:left;border-radius:var(--border-radius-md);padding:8px 10px;width:100%" onclick="sq('Show me my busiest days this month')">Busiest days</button>
+      </div>
+    </div>
+    <div class="chat-col">
+      <div class="chat-msgs" id="chat-msgs">
+        <div class="msg msg-ai">
+          Hey! I'm your AI dispatcher for Green Cut Pro. I have full access to your jobs, crew, clients, and revenue.<br><br>
+          Try saying things like:<br>
+          <b>→</b> "Schedule Maria Gonzalez for lawn mowing Monday 7am, 4521 Westheimer Rd, assign to Carlos, estimate $95"<br>
+          <b>→</b> "Add a new crew member: Jake Torres, lead tech, cell 713-555-0199"<br>
+          <b>→</b> "Reschedule the Thompson job to Friday at 9am"<br>
+          <b>→</b> "Mark the Gonzalez job complete and log $95 payment"<br>
+          <b>→</b> "Show me all jobs assigned to Carlos this week"<br>
+          <b>→</b> "Add client: David Park, 8820 Briar Forest Dr, recurring monthly mow"
+        </div>
+      </div>
+      <div class="qbtns">
+        <button class="qb" onclick="sq('Schedule a new job')">+ Job</button>
+        <button class="qb" onclick="sq('Add a new client')">+ Client</button>
+        <button class="qb" onclick="sq('Show this week schedule')">This week</button>
+        <button class="qb" onclick="sq('Revenue this month')">Revenue</button>
+        <button class="qb" onclick="sq('Who is free tomorrow?')">Availability</button>
+      </div>
+      <div class="input-row">
+        <input class="chat-input" id="chat-input" placeholder="Talk to your dispatcher — schedule, assign, reschedule..." />
+        <button class="send-btn" onclick="send()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- NEW JOB MODAL -->
+<div id="modal-job" style="display:none;position:absolute;top:0;left:0;width:100%;z-index:100">
+  <div class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">New job</div>
+      <div class="form-row"><label class="form-label">Client name</label><input class="form-input" id="nj-client" placeholder="e.g. Maria Gonzalez"></div>
+      <div class="form-row"><label class="form-label">Service</label>
+        <select class="form-select" id="nj-service">
+          <option>Lawn Mowing</option><option>Hedge Trimming</option><option>Tree Trimming</option><option>Mulching</option>
+          <option>Fertilization</option><option>Sod Installation</option><option>Irrigation Repair</option>
+          <option>Cleanup / Leaf Removal</option><option>Aeration</option><option>Pressure Washing</option>
+          <option>Landscaping Design</option><option>Full Yard Makeover</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">Address</label><input class="form-input" id="nj-addr" placeholder="Street address"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-row"><label class="form-label">Date</label><input class="form-input" id="nj-date" placeholder="e.g. Mon Apr 21"></div>
+        <div class="form-row"><label class="form-label">Time</label><input class="form-input" id="nj-time" placeholder="e.g. 8:00 AM"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="form-row"><label class="form-label">Assign crew</label>
+          <select class="form-select" id="nj-crew"><option value="Unassigned">Unassigned</option></select>
+        </div>
+        <div class="form-row"><label class="form-label">Estimate</label><input class="form-input" id="nj-est" placeholder="$0"></div>
+      </div>
+      <div class="form-row"><label class="form-label">Notes</label><input class="form-input" id="nj-notes" placeholder="Any special instructions..."></div>
+      <div class="modal-footer">
+        <button class="act-btn" onclick="closeModal('modal-job')">Cancel</button>
+        <button class="act-btn primary" onclick="saveNewJob()">Save job</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW CLIENT MODAL -->
+<div id="modal-client" style="display:none;position:absolute;top:0;left:0;width:100%;z-index:100">
+  <div class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Add client</div>
+      <div class="form-row"><label class="form-label">Full name</label><input class="form-input" id="nc-name" placeholder="e.g. David Park"></div>
+      <div class="form-row"><label class="form-label">Phone</label><input class="form-input" id="nc-phone" placeholder="713-555-0100"></div>
+      <div class="form-row"><label class="form-label">Email</label><input class="form-input" id="nc-email" placeholder="email@example.com"></div>
+      <div class="form-row"><label class="form-label">Address</label><input class="form-input" id="nc-addr" placeholder="Street address"></div>
+      <div class="form-row"><label class="form-label">Recurring service</label>
+        <select class="form-select" id="nc-recurring">
+          <option value="none">None / one-time</option>
+          <option value="weekly">Weekly</option>
+          <option value="biweekly">Bi-weekly</option>
+          <option value="monthly">Monthly</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">Notes</label><input class="form-input" id="nc-notes" placeholder="Property notes, gate codes, preferences..."></div>
+      <div class="modal-footer">
+        <button class="act-btn" onclick="closeModal('modal-client')">Cancel</button>
+        <button class="act-btn primary" onclick="saveNewClient()">Save client</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW CREW MODAL -->
+<div id="modal-crew" style="display:none;position:absolute;top:0;left:0;width:100%;z-index:100">
+  <div class="modal-bg">
+    <div class="modal">
+      <div class="modal-title">Add crew member</div>
+      <div class="form-row"><label class="form-label">Full name</label><input class="form-input" id="nw-name" placeholder="e.g. Carlos Mendez"></div>
+      <div class="form-row"><label class="form-label">Role</label>
+        <select class="form-select" id="nw-role">
+          <option>Lead technician</option><option>Crew member</option><option>Driver</option><option>Specialist</option><option>Supervisor</option>
+        </select>
+      </div>
+      <div class="form-row"><label class="form-label">Phone</label><input class="form-input" id="nw-phone" placeholder="713-555-0100"></div>
+      <div class="form-row"><label class="form-label">Hourly rate ($)</label><input class="form-input" id="nw-rate" placeholder="18"></div>
+      <div class="modal-footer">
+        <button class="act-btn" onclick="closeModal('modal-crew')">Cancel</button>
+        <button class="act-btn primary" onclick="saveNewCrew()">Add to crew</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let jobs=[], clients=[], crew=[], activity=[], chatHistory=[];
+
+const SERVICES=["Lawn Mowing","Hedge Trimming","Tree Trimming","Mulching","Fertilization","Sod Installation","Irrigation Repair","Cleanup / Leaf Removal","Aeration","Pressure Washing","Landscaping Design","Full Yard Makeover"];
+
+const SYS=`You are the AI dispatcher for "Green Cut Pro", a professional landscaping business in Houston, TX.
+
+CURRENT DATA:
+Jobs: JOBS
+Clients: CLIENTS
+Crew: CREW
+
+Respond ONLY with valid JSON (no markdown, no backticks) in this exact format:
+{
+  "reply": "friendly message confirming what you did",
+  "jobs": [...complete updated jobs array...],
+  "clients": [...complete updated clients array...],
+  "crew": [...complete updated crew array...],
+  "activity": "short one-line description of what changed, or null",
+  "action": "none|job_added|job_updated|job_completed|client_added|crew_added|bulk_update"
+}
+
+JOB object: { id, client, service, address, date, time, crew:"name or Unassigned", estimate:"$N or TBD", status:"scheduled|in-progress|pending|complete|cancelled", notes, payment:0 }
+CLIENT object: { id, name, phone, email, address, recurring:"none|weekly|biweekly|monthly", notes, totalJobs:0, totalRevenue:0 }
+CREW object: { id, name, role, phone, rate:"$N/hr", jobsThisWeek:0, status:"active|off" }
+
+Rules:
+- Return ALL three arrays completely every time
+- Auto-generate IDs like job-N, client-N, crew-N
+- When completing a job, set status=complete and payment=estimate amount as number
+- When adding a client from a job booking, also add them to clients if not already there
+- Be specific and friendly in reply
+- Services must be from: ${SERVICES.join(", ")}
+- Crew must be from existing crew list or "Unassigned"`;
+
+async function callAI(msg){
+  const sys=SYS.replace("JOBS",JSON.stringify(jobs)).replace("CLIENTS",JSON.stringify(clients)).replace("CREW",JSON.stringify(crew));
+  chatHistory.push({role:"user",content:msg});
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,system:sys,messages:chatHistory})});
+    const data=await res.json();
+    const raw=data.content?.map(b=>b.text||"").join("").trim();
+    let p;
+    try{p=JSON.parse(raw.replace(/```json|```/g,"").trim());}
+    catch{p={reply:"I had trouble with that — could you try again?",jobs,clients,crew,activity:null,action:"none"};}
+    chatHistory.push({role:"assistant",content:raw});
+    if(p.jobs)jobs=p.jobs;
+    if(p.clients)clients=p.clients;
+    if(p.crew)crew=p.crew;
+    if(p.activity){activity.unshift({text:p.activity,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});if(activity.length>20)activity.pop();}
+    return p;
+  }catch{return{reply:"Something went wrong. Please try again.",jobs,clients,crew,activity:null,action:"none"};}
+}
+
+function initials(n){return n.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);}
+const badgeClass={scheduled:"bs","in-progress":"bi",complete:"bc",cancelled:"bx",pending:"bp"};
+
+function renderAll(){
+  renderDashboard();renderJobsList();renderClientsList();renderCrewGrid();renderRevenue();renderRoutes();
+  const sel=document.querySelector(".job-item.sel");
+  if(sel){const jid=sel.dataset.id;const j=jobs.find(x=>x.id===jid);if(j)renderJobDetail(j);}
+  updateCrewDropdown();
+}
+
+function renderDashboard(){
+  const sched=jobs.filter(j=>j.status==="scheduled");
+  const pend=jobs.filter(j=>j.status==="pending");
+  document.getElementById("s-today").textContent=sched.length;
+  document.getElementById("s-week").textContent=jobs.filter(j=>j.status!=="cancelled").length;
+  document.getElementById("s-pending").textContent=pend.length;
+  document.getElementById("s-crew").textContent=crew.filter(c=>c.status==="active").length;
+  const rev=jobs.filter(j=>j.status==="complete").reduce((s,j)=>s+(j.payment||0),0);
+  document.getElementById("s-rev").textContent="$"+rev.toLocaleString();
+  document.getElementById("s-clients").textContent=clients.length;
+  const todayList=document.getElementById("dash-today-list");
+  todayList.innerHTML=sched.length?sched.slice(0,6).map(j=>`<div class="job-item"><div class="ji-top"><span class="ji-name">${j.client}</span><span class="badge bs">scheduled</span></div><div class="ji-service">${j.service}</div><div class="ji-meta">${j.time||"TBD"}<span class="dot-sep"></span>${j.crew||"Unassigned"}</div></div>`).join(""):'<div class="empty-hint">No scheduled jobs.</div>';
+  const weekList=document.getElementById("dash-week-list");
+  const upcoming=jobs.filter(j=>j.status==="scheduled"||j.status==="pending");
+  weekList.innerHTML=upcoming.length?upcoming.slice(0,8).map(j=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${j.client}</div><div style="font-size:12px;color:var(--color-text-secondary)">${j.service} · ${j.date} ${j.time||""}</div></div><span class="badge ${badgeClass[j.status]||'bp'}">${j.status}</span></div>`).join(""):'<div style="font-size:13px;color:var(--color-text-secondary)">No upcoming jobs.</div>';
+  const actEl=document.getElementById("dash-activity");
+  actEl.innerHTML=activity.length?activity.slice(0,6).map(a=>`<div style="display:flex;gap:10px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="font-size:11px;color:var(--color-text-secondary);white-space:nowrap;margin-top:1px">${a.time}</span><span style="font-size:13px;color:var(--color-text-primary)">${a.text}</span></div>`).join(""):'<div style="font-size:13px;color:var(--color-text-secondary)">No recent activity.</div>';
+}
+
+function renderJobsList(){
+  const filter=document.getElementById("job-filter").value;
+  const filtered=filter==="all"?jobs:jobs.filter(j=>j.status===filter);
+  const el=document.getElementById("jobs-list");
+  el.innerHTML=filtered.length?filtered.map(j=>`<div class="job-item" data-id="${j.id}" onclick="selectJob('${j.id}',this)"><div class="ji-top"><span class="ji-name">${j.client}</span><span class="badge ${badgeClass[j.status]||'bp'}">${j.status}</span></div><div class="ji-service">${j.service}</div><div class="ji-meta">${j.date||"No date"} ${j.time||""}<span class="dot-sep"></span>${j.estimate||"TBD"}</div></div>`).join(""):'<div class="empty-hint">No jobs match this filter.</div>';
+}
+
+function filterJobs(v){renderJobsList();}
+
+function selectJob(id,el){
+  document.querySelectorAll(".job-item").forEach(e=>e.classList.remove("sel"));
+  if(el)el.classList.add("sel");
+  const j=jobs.find(x=>x.id===id);
+  if(j)renderJobDetail(j);
+}
+
+function renderJobDetail(j){
+  const el=document.getElementById("job-detail");
+  el.innerHTML=`
+    <div class="dp-hdr">
+      <div><div class="dp-title">${j.client}</div><div class="dp-sub">${j.service}</div></div>
+      <span class="badge ${badgeClass[j.status]||'bp'}" style="font-size:12px;padding:4px 10px">${j.status}</span>
+    </div>
+    <div class="dp-actions">
+      ${j.status!=="complete"?`<button class="act-btn primary" onclick="quickAction('Mark job ${j.id} as complete and log payment of ${j.estimate||"the estimate amount"}')">Mark complete</button>`:""}
+      ${j.status==="scheduled"||j.status==="pending"?`<button class="act-btn" onclick="quickAction('Mark job ${j.id} as in progress')">Start job</button>`:""}
+      <button class="act-btn" onclick="quickAction('Reschedule job ${j.id}')">Reschedule</button>
+      <button class="act-btn danger" onclick="quickAction('Cancel job ${j.id}')">Cancel</button>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="info-lbl">Date & time</div><div class="info-val">${j.date||"TBD"} ${j.time||""}</div></div>
+      <div class="info-card"><div class="info-lbl">Estimate</div><div class="info-val">${j.estimate||"TBD"}</div></div>
+      <div class="info-card"><div class="info-lbl">Address</div><div class="info-val">${j.address||"TBD"}</div></div>
+      <div class="info-card"><div class="info-lbl">Assigned crew</div><div class="info-val">${j.crew||"Unassigned"}</div></div>
+      ${j.payment?`<div class="info-card"><div class="info-lbl">Payment received</div><div class="info-val" style="color:#3B6D11">$${j.payment}</div></div>`:""}
+      <div class="info-card"><div class="info-lbl">Job ID</div><div class="info-val" style="color:var(--color-text-secondary)">${j.id}</div></div>
+    </div>
+    ${j.notes?`<div class="section-hdr">Notes</div><div class="notes-box">${j.notes}</div>`:""}
+    <div class="section-hdr">Job checklist</div>
+    <div class="checklist">
+      ${["Equipment loaded","Arrived on site","Work completed","Cleanup done","Client notified"].map((t,i)=>`<label class="check-item"><input type="checkbox" ${j.status==="complete"?"checked":""} onchange="this.parentNode.querySelector('span').className=this.checked?'check-done':''"><span ${j.status==="complete"?'class="check-done"':''}>${t}</span></label>`).join("")}
+    </div>`;
+}
+
+function renderClientsList(){
+  const el=document.getElementById("clients-list");
+  el.innerHTML=clients.length?clients.map(c=>`<div class="client-item" onclick="selectClient('${c.id}')"><div class="ci-row"><div class="ci-avatar">${initials(c.name)}</div><div><div class="ci-name">${c.name}</div><div class="ci-meta">${c.phone||c.email||"No contact"} · ${c.recurring!=="none"?c.recurring+" mow":"One-time"}</div></div></div></div>`).join(""):'<div class="empty-hint">No clients yet.<br>Add via AI Dispatch or the + button.</div>';
+}
+
+function selectClient(id){
+  const c=clients.find(x=>x.id===id);if(!c)return;
+  const clientJobs=jobs.filter(j=>j.client.toLowerCase().includes(c.name.toLowerCase().split(" ")[0]));
+  const el=document.getElementById("client-detail");
+  el.innerHTML=`
+    <div class="dp-hdr">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:48px;height:48px;border-radius:50%;background:#EAF3DE;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;color:#27500A">${initials(c.name)}</div>
+        <div><div class="dp-title">${c.name}</div><div class="dp-sub">${c.recurring!=="none"?c.recurring+" recurring":"One-time client"}</div></div>
+      </div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="info-lbl">Phone</div><div class="info-val">${c.phone||"—"}</div></div>
+      <div class="info-card"><div class="info-lbl">Email</div><div class="info-val">${c.email||"—"}</div></div>
+      <div class="info-card"><div class="info-lbl">Address</div><div class="info-val">${c.address||"—"}</div></div>
+      <div class="info-card"><div class="info-lbl">Service frequency</div><div class="info-val">${c.recurring||"—"}</div></div>
+      <div class="info-card"><div class="info-lbl">Total jobs</div><div class="info-val">${clientJobs.length}</div></div>
+      <div class="info-card"><div class="info-lbl">Total revenue</div><div class="info-val" style="color:#3B6D11">$${clientJobs.filter(j=>j.status==="complete").reduce((s,j)=>s+(j.payment||0),0)}</div></div>
+    </div>
+    ${c.notes?`<div class="section-hdr">Property notes</div><div class="notes-box">${c.notes}</div>`:""}
+    <div class="section-hdr">Job history (${clientJobs.length})</div>
+    ${clientJobs.length?clientJobs.map(j=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${j.service}</div><div style="font-size:12px;color:var(--color-text-secondary)">${j.date} ${j.time||""} · ${j.estimate||"TBD"}</div></div><span class="badge ${badgeClass[j.status]||'bp'}">${j.status}</span></div>`).join(""):`<div style="font-size:13px;color:var(--color-text-secondary)">No jobs yet.</div>`}
+    <div style="margin-top:16px"><button class="act-btn primary" onclick="quickAction('Schedule a new job for ${c.name} at ${c.address||"their address"}')">Schedule job ↗</button></div>`;
+}
+
+function renderCrewGrid(){
+  const el=document.getElementById("crew-grid");
+  el.innerHTML=crew.length?crew.map(c=>`<div class="crew-card">
+    <div class="crew-avatar">${initials(c.name)}</div>
+    <div class="crew-name">${c.name}</div>
+    <div class="crew-role">${c.role}</div>
+    <div class="crew-stats">
+      <div class="cs-item"><span class="cs-num">${jobs.filter(j=>j.crew===c.name&&(j.status==="scheduled"||j.status==="in-progress")).length}</span>Active jobs</div>
+      <div class="cs-item"><span class="cs-num">${jobs.filter(j=>j.crew===c.name&&j.status==="complete").length}</span>Completed</div>
+    </div>
+    <div class="crew-status"><div class="status-dot ${c.status==="active"?"sd-active":"sd-off"}"></div><span style="font-size:12px;color:var(--color-text-secondary)">${c.status==="active"?"Available":"Off duty"}</span></div>
+    ${c.phone?`<div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">${c.phone}</div>`:""}
+    ${c.rate?`<div style="font-size:12px;color:var(--color-text-secondary)">${c.rate}</div>`:""}
+  </div>`).join(""):'<div class="empty-hint" style="padding:40px;grid-column:1/-1">No crew members yet.<br>Add your team to start assigning jobs.</div>';
+}
+
+function renderRevenue(){
+  const done=jobs.filter(j=>j.status==="complete"&&j.payment);
+  const total=done.reduce((s,j)=>s+(j.payment||0),0);
+  const avg=done.length?Math.round(total/done.length):0;
+  document.getElementById("r-month").textContent="$"+total.toLocaleString();
+  document.getElementById("r-year").textContent="$"+total.toLocaleString();
+  document.getElementById("r-avg").textContent="$"+avg;
+  const bySvc={};
+  done.forEach(j=>{bySvc[j.service]=(bySvc[j.service]||0)+(j.payment||0);});
+  const svcEl=document.getElementById("rev-by-service");
+  if(Object.keys(bySvc).length){
+    const max=Math.max(...Object.values(bySvc));
+    svcEl.innerHTML=Object.entries(bySvc).sort((a,b)=>b[1]-a[1]).map(([s,v])=>`<div class="svc-row"><span class="svc-name">${s}</span><div class="svc-bar-wrap"><div class="svc-bar" style="width:${Math.round(v/max*100)}%"></div></div><span class="svc-rev">$${v}</span></div>`).join("");
+  }else{svcEl.innerHTML='<div class="empty-hint">Complete jobs to see breakdown.</div>';}
+  const payEl=document.getElementById("rev-payments");
+  payEl.innerHTML=done.length?done.slice().reverse().map(j=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:0.5px solid var(--color-border-tertiary)"><div><div style="font-size:13px;font-weight:500;color:var(--color-text-primary)">${j.client}</div><div style="font-size:12px;color:var(--color-text-secondary)">${j.service} · ${j.date}</div></div><span style="font-size:14px;font-weight:500;color:#3B6D11">+$${j.payment}</span></div>`).join(""):'<div class="empty-hint">No payments yet.</div>';
+}
+
+function renderRoutes(){
+  const sched=jobs.filter(j=>j.status==="scheduled"||j.status==="in-progress");
+  const byDate={};
+  sched.forEach(j=>{const d=j.date||"Unscheduled";if(!byDate[d])byDate[d]=[];byDate[d].push(j);});
+  const el=document.getElementById("route-list");
+  if(!Object.keys(byDate).length){el.innerHTML='<div class="empty-hint">No scheduled jobs.<br>Schedule jobs via AI Dispatch to see routes.</div>';return;}
+  el.innerHTML=Object.entries(byDate).map(([date,dayJobs])=>`
+    <div class="route-day">
+      <div class="route-date">${date} — ${dayJobs.length} stop${dayJobs.length!==1?"s":""}</div>
+      ${dayJobs.map((j,i)=>`<div class="route-stop"><div class="stop-num">${i+1}</div><div class="stop-info"><div class="stop-name">${j.client}</div><div class="stop-detail">${j.service} · ${j.time||"TBD"} · ${j.address||"No address"} · ${j.crew||"Unassigned"}</div></div><span class="badge ${badgeClass[j.status]||'bp'}">${j.status}</span></div>`).join("")}
+    </div>`).join("");
+}
+
+function updateCrewDropdown(){
+  const sel=document.getElementById("nj-crew");
+  if(!sel)return;
+  sel.innerHTML='<option value="Unassigned">Unassigned</option>'+crew.map(c=>`<option>${c.name}</option>`).join("");
+}
+
+function addMsg(text,role){
+  const c=document.getElementById("chat-msgs");
+  const now=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+  const d=document.createElement("div");d.className="msg msg-"+role;
+  d.innerHTML=text.replace(/\n/g,"<br>");
+  const t=document.createElement("div");t.className="msg-ts";t.textContent=now;
+  d.appendChild(t);c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+
+function showTyping(){
+  const c=document.getElementById("chat-msgs");
+  const d=document.createElement("div");d.className="typing";d.id="typing";
+  d.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  c.appendChild(d);c.scrollTop=c.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById("typing");if(t)t.remove();}
+
+async function send(){
+  const inp=document.getElementById("chat-input");
+  const txt=inp.value.trim();if(!txt)return;
+  inp.value="";addMsg(txt,"user");showTyping();
+  const r=await callAI(txt);hideTyping();
+  addMsg(r.reply,"ai");renderAll();
+}
+
+function sq(t){
+  showPage("dispatch",document.querySelector('.nav-btn:last-child'));
+  setTimeout(()=>{document.getElementById("chat-input").value=t;send();},100);
+}
+
+function quickAction(t){
+  showPage("dispatch",null);
+  setTimeout(()=>{document.getElementById("chat-input").value=t;send();},100);
+}
+
+function showPage(id,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById("page-"+id).classList.add("active");
+  if(btn){document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
+  else{document.querySelectorAll(".nav-btn").forEach(b=>{if(b.textContent.toLowerCase().includes(id))b.classList.add("active")});}
+}
+
+function openNewJob(){document.getElementById("modal-job").style.display="block";}
+function openNewClient(){document.getElementById("modal-client").style.display="block";}
+function openNewCrew(){document.getElementById("modal-crew").style.display="block";}
+function closeModal(id){document.getElementById(id).style.display="none";}
+
+function saveNewJob(){
+  const id="job-"+(jobs.length+1);
+  const j={id,client:document.getElementById("nj-client").value||"Unknown client",service:document.getElementById("nj-service").value,address:document.getElementById("nj-addr").value||"TBD",date:document.getElementById("nj-date").value||"TBD",time:document.getElementById("nj-time").value||"",crew:document.getElementById("nj-crew").value||"Unassigned",estimate:document.getElementById("nj-est").value||"TBD",status:"scheduled",notes:document.getElementById("nj-notes").value||"",payment:0};
+  jobs.push(j);activity.unshift({text:`New job added: ${j.client} – ${j.service}`,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});
+  closeModal("modal-job");renderAll();
+}
+
+function saveNewClient(){
+  const id="client-"+(clients.length+1);
+  const c={id,name:document.getElementById("nc-name").value||"Unknown",phone:document.getElementById("nc-phone").value||"",email:document.getElementById("nc-email").value||"",address:document.getElementById("nc-addr").value||"",recurring:document.getElementById("nc-recurring").value||"none",notes:document.getElementById("nc-notes").value||"",totalJobs:0,totalRevenue:0};
+  clients.push(c);activity.unshift({text:`New client added: ${c.name}`,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});
+  closeModal("modal-client");renderAll();
+}
+
+function saveNewCrew(){
+  const id="crew-"+(crew.length+1);
+  const rate=document.getElementById("nw-rate").value;
+  const c={id,name:document.getElementById("nw-name").value||"New member",role:document.getElementById("nw-role").value,phone:document.getElementById("nw-phone").value||"",rate:rate?"$"+rate+"/hr":"",jobsThisWeek:0,status:"active"};
+  crew.push(c);activity.unshift({text:`New crew member: ${c.name}`,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});
+  closeModal("modal-crew");renderAll();
+}
+
+renderAll();
+</script>
