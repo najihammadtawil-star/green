@@ -447,21 +447,37 @@ async function callAI(msg){
   const sys=SYS.replace("JOBS",JSON.stringify(jobs)).replace("CLIENTS",JSON.stringify(clients)).replace("CREW",JSON.stringify(crew));
   chatHistory.push({role:"user",content:msg});
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:2000,system:sys,messages:chatHistory})});
+    const res=await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"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"
+      },
+      body:JSON.stringify({
+        model:"gpt-4o-mini",
+        messages:[{role:"system",content:sys},...chatHistory],
+        max_tokens:2000
+      })
+    });
     const data=await res.json();
-    const raw=data.content?.map(b=>b.text||"").join("").trim();
+    const raw=data.choices?.[0]?.message?.content||"";
     let p;
-    try{p=JSON.parse(raw.replace(/```json|```/g,"").trim());}
-    catch{p={reply:"I had trouble with that — could you try again?",jobs,clients,crew,activity:null,action:"none"};}
+    try{
+      p=JSON.parse(raw.replace(/```json|```/g,"").trim());
+    }catch{
+      p={reply:"I had trouble with that — could you try again?",jobs,clients,crew,activity:null,action:"none"};
+    }
     chatHistory.push({role:"assistant",content:raw});
     if(p.jobs)jobs=p.jobs;
     if(p.clients)clients=p.clients;
     if(p.crew)crew=p.crew;
     if(p.activity){activity.unshift({text:p.activity,time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});if(activity.length>20)activity.pop();}
     return p;
-  }catch{return{reply:"Something went wrong. Please try again.",jobs,clients,crew,activity:null,action:"none"};}
+  }catch(e){
+    console.error("AI Error:",e);
+    return{reply:"Something went wrong. Please try again.",jobs,clients,crew,activity:null,action:"none"};
+  }
 }
-
 function initials(n){return n.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2);}
 const badgeClass={scheduled:"bs","in-progress":"bi",complete:"bc",cancelled:"bx",pending:"bp"};
 
